@@ -1,0 +1,4 @@
+{
+    "python.linting.enabled": true,
+    "python.pythonPath": "/Users/lillyluo/opt/miniconda3/envs/aoc/bin/python"
+}
