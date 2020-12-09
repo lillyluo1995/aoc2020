@@ -2,7 +2,6 @@ from typing import IO
 import re
 from collections import deque
 
-
 def parse_line(line):
     '''given a line, split it into the important stuff
     i assume the order will always be x x bags contains num x x....'''
@@ -10,7 +9,6 @@ def parse_line(line):
     # there must be a better way to do the below via regex...
     bagofwords = [x for x in bagofwords if len(x) > 0]
     return bagofwords
-
 
 def bfs(mapping, root):
     '''count number of children in tree starting at root'''
@@ -33,7 +31,11 @@ def bfs(mapping, root):
     return num_children
 
 def dfs(mapping, root):
-    '''dfs to find number of children but need to scale by multiple'''
+    '''dfs to find number of children but need to scale by multiple
+    the thought process here is: the number of children in shiny gold
+    is a subset of all the smaller trees (subset of shiny gold) then
+    add shiny gold. so i can use recursion to find the number of children
+    in the smaller tables'''
     queue_ = deque()
     queue_.append(root)
 
@@ -104,5 +106,5 @@ def p_2(input_file: IO,
     mapping = parse(input_file)
 
     # now this is the root of my tree and i'm going to see how
-    # many children it has
+    # many children it has, scaled appropriately
     return dfs(mapping, 'shiny gold')
