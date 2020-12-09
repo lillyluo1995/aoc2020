@@ -23,6 +23,12 @@ def parse_instruction(inst):
         step_incr = ValueError
     return acc_incr, step_incr
 
+def parse_to_rules(input_file):
+    '''parse from the input file into an array of tuples that will be the rules'''
+    #how do i get this regex to not include an extra 3rd tuple of the sign?
+    instr_regex = re.compile(r"(nop|acc|jmp)\s((\+|-)[0-9]+)")
+    rules = [instr_regex.match(line).groups()[0:2] for line in input_file]
+    return rules
 
 def run_iteration(rules):
     '''run through the rules as intended, returns the final accum
@@ -54,8 +60,7 @@ def run_iteration(rules):
 def p_1(input_file: IO,
         debug=False):  # pylint: disable=unused-argument
     '''find the value of accumulator before the process repeats'''
-    # there must be a better regex way to handle the rstrip('\n')
-    rules = [re.split(r"[\s]", line.rstrip('\n')) for line in input_file]
+    rules = parse_to_rules(input_file)
     accum, finish = run_iteration(rules)
     assert not finish
     return accum
@@ -65,9 +70,9 @@ def switch_index(rules_, index_change):
     '''switch the jmp or nop at that index'''
     rules_2 = copy.deepcopy(rules_)
     if rules_[index_change][0] == 'jmp':
-        rules_2[index_change][0] = 'nop'
+        rules_2[index_change] = ('nop', rules_2[index_change][1])
     else:
-        rules_2[index_change][0] = 'jmp'
+        rules_2[index_change][0] = ('jmp', rules_2[index_change][1])
     return rules_2
 
 
@@ -75,9 +80,7 @@ def p_2(input_file: IO,
         debug=False):  # pylint: disable=unused-argument
     '''one nop->jmp or one jmp->nop which one'''
     # i'm just going to loop thru all jmps...there must be a better way to do....
-
-    # there must be a better regex way to handle the rstrip('\n')
-    rules = [re.split(r"[\s]", line.rstrip('\n')) for line in input_file]
+    rules = parse_to_rules(input_file)
 
     to_switch = [idx for idx, element in enumerate(rules)
                  if element[0] == 'jmp']
