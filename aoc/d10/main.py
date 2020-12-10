@@ -1,5 +1,6 @@
 from typing import IO
 from collections import deque
+from functools import lru_cache
 
 
 def parse_file(input_file):
@@ -41,38 +42,29 @@ def p_1(input_file: IO,
     # add 1 to num_3 because of the final adaptor
     return num_1 * (num_3+1)
 
-#this global map really needs to be improved
-BIG_MAP = {0: 1, 1: 1}
+def find_iteration_wrapper(adaptors, target):
+    '''wrapper to take in the adaptors argument'''
+    @lru_cache()
+    def find_iteration(target):
+        '''how many ways are there to reach target?'''
+        if len(adaptors) == 0:
+            return 0
+        if target == 0:
+            return 1
+        if target == 1:
+            return 1
 
+        possible = {target-i for i in range(1, 4)}
 
-def find_num_iteration(adaptors):
-    '''given a list of adaptors (assumed ascending sorted), return
-    number of ways to get to the max in the list (which is the last one)'''
-    if len(adaptors) == 0:
-        return 0
-    target = adaptors[-1]
-    if target in BIG_MAP:
-        return BIG_MAP[target]
-    possible = {target-i for i in range(1, 4)}
+        #this can be optimized if necessary to not pass in all of adaptors
+        #but it didn't seem like it had a huge impact on run time vs the cache...
+        #n isn't that high after all
+        existing = [x for x in adaptors if x in possible and x >= 0]
+        total_iterations = sum([find_iteration(x)
+                                for x in existing])
+        return total_iterations
 
-    existing = []
-    existing_idx = []
-    if len(adaptors) <= 3:
-        for idx, adaptor in enumerate(adaptors):
-            adaptor = adaptors[idx]
-            if adaptor in possible and adaptor >= 0:
-                existing.append(adaptor)
-                existing_idx.append(idx)
-    else:
-        for idx, adaptor in enumerate(adaptors[-4:]):
-            if adaptor in possible and adaptor >= 0:
-                existing.append(adaptor)
-                existing_idx.append(idx-4)
-
-    total_iterations = sum([find_num_iteration(adaptors[:x+1])
-                            for x in existing_idx])
-    BIG_MAP[target] = total_iterations
-    return total_iterations
+    return find_iteration(target)
 
 
 def p_2(input_file: IO,
@@ -84,4 +76,5 @@ def p_2(input_file: IO,
     # first sort the adaptors
     adaptors.sort()
 
-    return find_num_iteration(adaptors)
+    #since sorted by ascending target is the last element
+    return find_iteration_wrapper(adaptors, adaptors[-1])
