@@ -19,7 +19,7 @@ def read_file(input_file):
                   for x in input_file.readlines()]
 
     # need to use yield as here to be more efficient...
-    directions = [[x[0], int(x[1])] for x in directions]
+    directions = [(x[0], int(x[1])) for x in directions]
     return directions
 
 
