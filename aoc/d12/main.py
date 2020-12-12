@@ -15,7 +15,7 @@ MAPPING = {
 def read_file(input_file):
     '''read the input file of instructions'''
     regex_instr = re.compile('([A-Z])([0-9]+)')
-    directions = [list(regex_instr.match(x).groups())
+    directions = [regex_instr.match(x).groups()
                   for x in input_file.readlines()]
 
     # need to use yield as here to be more efficient...
