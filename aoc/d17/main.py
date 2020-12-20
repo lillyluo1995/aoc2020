@@ -94,7 +94,7 @@ def p_1(input_file: IO,
 
 def p_2(input_file: IO,
         debug=False):  # pylint: disable=unused-argument
-    '''return number of active states with 3 dimensions'''
+    '''return number of active states with 4 dimensions'''
     num_iter = 6
     dims = 4
     current = parse(input_file, dims)
