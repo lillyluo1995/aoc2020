@@ -134,7 +134,7 @@ def rpn_2(line):
 
 def p_2(input_file: IO,
         debug=False):  # pylint: disable=unused-argument
-    '''solve as left to right but addition > mult'''
+    '''solve as left to right but addition > mult. SHUNTING YARD'''
     inputs = read_line(input_file)
     total_sum = 0
     for line in inputs:
