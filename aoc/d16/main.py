@@ -2,6 +2,8 @@ from typing import IO
 import re
 import itertools
 
+from aoc.common import helpers
+
 
 def process_file_1(input_file):
     '''process the chunks of file. only need numbers here'''
@@ -57,6 +59,7 @@ def find_bad_tickets(pairs, tickets):
     bad_nums = []
     bad_tix = set()
     # i guess i'll just do it naively first...
+
     for idx, ticket in enumerate(tickets):
         for num in ticket:
             good = False
@@ -67,17 +70,6 @@ def find_bad_tickets(pairs, tickets):
                 bad_nums.append(num)
                 bad_tix.add(idx)
     return bad_nums, bad_tix
-
-
-def find_limiting_label(mapping):
-    '''find the label in the mapping with the fewest options'''
-    min_seats = 20
-    label_choice = ''
-    for label, poss_idx in mapping.items():
-        if len(poss_idx) < min_seats:
-            min_seats = len(poss_idx)
-            label_choice = label
-    return label_choice
 
 def get_possible_mapping(ranges, tickets):
     '''given ranges of acceptable numbers and a set of tickets, return
@@ -96,28 +88,6 @@ def get_possible_mapping(ranges, tickets):
                 else:
                     mapping[label] = [idx]
     return mapping
-
-def organize_idx_map(mapping):
-    '''given a mapping that has label --> to all options,
-    return a mapping that has label --> 1 option'''
-    # now we have all the possible ones...so we have to sift thru
-    organized = False
-    final_mapping = {}
-    num_labels = len(mapping.keys())
-    while not organized:
-        # find the label with the least options...
-        limiting_label = find_limiting_label(mapping)
-        assert len(mapping[limiting_label]) == 1
-        final_seat = mapping[limiting_label][0]
-        final_mapping[final_seat] = limiting_label
-        del mapping[limiting_label]
-        for _, poss_idx in mapping.items():
-            if final_seat in poss_idx:
-                poss_idx.remove(final_seat)
-        if len(final_mapping.keys()) == num_labels:
-            organized = True
-    return final_mapping
-
 
 def p_1(input_file: IO,
         debug=False):  # pylint: disable=unused-argument
@@ -141,7 +111,7 @@ def p_2(input_file: IO,
                 if idx not in bad_tix]
 
     mapping = get_possible_mapping(num_ranges, good_tix)
-    final_mapping = organize_idx_map(mapping)
+    final_mapping = helpers.organize_idx_map(mapping)
 
     req_prod = 1
     for idx, num in enumerate(my_ticket):
