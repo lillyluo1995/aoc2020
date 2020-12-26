@@ -51,13 +51,13 @@ class DoublyCircularLinkedList():
         found = False
         node = self.head
         counter = 0
-        while not found and counter < 1000:
+        while not found and counter < 10000000:
             if node.data == target:
                 found = True
             else:
                 node = node.next
                 counter += 1
-        if counter == 1000:
+        if counter == 10000000:
             print('stuck trying to find {target} on {node}'.format(
                 target=target, node=node.data))
         return node
@@ -75,8 +75,7 @@ class DoublyCircularLinkedList():
             node = node.next
             if node.data in list_values:
                 finished = True
-        print(list_values)
-        return ''.join([str(x) for x in list_values])
+        return list_values
 
     def print_tail(self, start=None):
         '''print backwards for debuggin'''
@@ -97,37 +96,37 @@ def parse_input(input_line):
     '''parse in input and return doubly circular linked list'''
     input_list = [int(num) for num in input_line]
     cups = DoublyCircularLinkedList()
+    mapping = {}
     for num in input_list:
         cups.add(num)
-    return cups, max(input_list), min(input_list)
+        mapping[num] = cups.tail
+    return cups, mapping, max(input_list), min(input_list)
 
 
 def get_pickup_labels(current_node):
     '''get the cups we'll be picking up'''
     pickup_node = current_node
     pickup_labels = []
-    for _ in range(3):
+    for num in range(3):
         pickup_node = pickup_node.next
         pickup_labels.append(pickup_node.data)
-    return pickup_labels
+        if num == 0:
+            first_pickup = pickup_node
+        if num == 2:
+            last_pickup = pickup_node
+    return pickup_labels, first_pickup, last_pickup
 
 
-def rewire_cups(cups, current_data, min_cup, max_cup):
+def rewire_cups(cups, current_node, mapping, min_cup, max_cup):
     '''rewire the cups as described'''
-    current_node = cups.search(current_data)
-
-    pickup_labels = get_pickup_labels(current_node)
+    current_data = current_node.data
+    pickup_labels, first_pickup, last_pickup = get_pickup_labels(current_node)
     dest_label = current_data - 1
     while dest_label in pickup_labels or dest_label < min_cup:
         dest_label -= 1
         if dest_label < min_cup:
             dest_label = max_cup
-    dest_node = cups.search(dest_label)
-
-    # first we rewire the first pickup cup
-    first_pickup = cups.search(pickup_labels[0])
-    last_pickup = cups.search(pickup_labels[-1])
-
+    dest_node = mapping[dest_label]
     # set the previous of the destination node...
     dest_node_prev = dest_node.prev
     while dest_node_prev.data in pickup_labels:
@@ -145,19 +144,40 @@ def rewire_cups(cups, current_data, min_cup, max_cup):
     last_pickup_next = last_pickup.next
     last_pickup_next.set_prev(first_pickup_prev)
     last_pickup.set_next(dest_node_next)
-    return cups, current_node.next.data
+
+    return cups, current_node.next
 
 
 def p_1(input_file: IO, debug=False):  # pylint: disable=unused-argument
     '''use the input to determine output after 100 rounds'''
     input_line = '467528193'
-    cups, max_cup, min_cup = parse_input(input_line)
-    current_data = cups.head.data
+    cups, mapping, max_cup, min_cup = parse_input(input_line)
+    current_node = cups.head
     for _ in range(100):
-        cups, current_data = rewire_cups(cups, current_data, min_cup, max_cup)
-    return cups.print(1)[1:]
+        cups, current_node = rewire_cups(
+            cups, current_node, mapping, min_cup, max_cup)
+    return ''.join([str(num) for num in cups.print(1)[1:]])
 
 
-def p_2(input_file: IO,
-        debug=False):  # pylint: disable=unused-argument
-    pass
+def p_2(input_file: IO, debug=False):  # pylint: disable=unused-argument
+    '''more cups...more rounds'''
+    input_line = '467528193'
+    cups, mapping, max_cup, min_cup = parse_input(input_line)
+
+    total_cups = 1000000
+    for num in range(max_cup+1, total_cups+1):
+        cups.add(num)
+        mapping[num] = cups.tail
+    max_cup = total_cups
+
+    current_node = cups.head
+    for num_round in range(total_cups*10):
+        if num_round % total_cups == 0:
+            print(num_round)
+        cups, current_node = rewire_cups(
+            cups, current_node, mapping, min_cup, max_cup)
+
+    node_1 = cups.search(1)
+    next_1 = node_1.next
+    next_2 = next_1.next
+    return next_1.data*next_2.data
