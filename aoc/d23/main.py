@@ -46,7 +46,7 @@ class DoublyCircularLinkedList():
         # set as the tail
         self.tail = new_node
 
-    def search(self, target):
+    def search(self, target=None):
         '''return the node in this list that has the target'''
         found = False
         node = self.head
@@ -177,7 +177,7 @@ def p_2(input_file: IO, debug=False):  # pylint: disable=unused-argument
         cups, current_node = rewire_cups(
             cups, current_node, mapping, min_cup, max_cup)
 
-    node_1 = cups.search(1)
+    node_1 = mapping[1]
     next_1 = node_1.next
     next_2 = next_1.next
     return next_1.data*next_2.data
