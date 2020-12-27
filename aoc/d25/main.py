@@ -18,8 +18,8 @@ def decrypt(subject, num_loops):
         current = current * subject % divisor
     return current
 
-def p_1(input_file: IO,
-        debug=False): # pylint: disable=unused-argument
+def p_1(input_file: IO, debug=False): # pylint: disable=unused-argument
+    '''encrypt/decrypt the card and door'''
     card_public = 9789649
     door_public = 3647239
     subject = 7
@@ -33,6 +33,6 @@ def p_1(input_file: IO,
     return encrypt_card
 
 
-def p_2(input_file: IO,
-        debug=False): # pylint: disable=unused-argument
+def p_2(input_file: IO, debug=False): # pylint: disable=unused-argument
+    '''unknown part 2....'''
     pass
