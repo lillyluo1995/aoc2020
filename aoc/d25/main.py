@@ -35,4 +35,4 @@ def p_1(input_file: IO, debug=False): # pylint: disable=unused-argument
 
 def p_2(input_file: IO, debug=False): # pylint: disable=unused-argument
     '''unknown part 2....'''
-    pass
+    return 'Success'
